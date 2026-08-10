@@ -85,12 +85,15 @@ function Assessment() {
         .map((q, i) => ({ q, i }))
         .filter(({ i }) => !correct[i])
         .slice(0, 10)
-        .map(({ q, i }) => ({
-          topic: q.topic,
-          question: q.question,
-          chosen: answers[i] >= 0 ? (q.options[answers[i]] ?? "no answer") : "no answer",
-          correct: q.options[q.correct_index] ?? "",
-        }));
+        .map(({ q, i }) => {
+          const choice = answers[i] ?? -1;
+          return {
+            topic: q.topic,
+            question: q.question,
+            chosen: choice >= 0 ? (q.options[choice] ?? "no answer") : "no answer",
+            correct: q.options[q.correct_index] ?? "",
+          };
+        });
 
       let analysis: AssessmentAnalysis;
       try {
