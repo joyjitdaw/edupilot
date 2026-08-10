@@ -1,4 +1,4 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   BrainCircuit,
@@ -219,4 +219,3 @@ function Landing() {
   );
 }
 
-export { redirect };
