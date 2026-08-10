@@ -15,7 +15,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as AuthenticatedAssessmentRouteImport } from './routes/_authenticated/assessment'
 import { Route as AuthenticatedAssessmentResultsRouteImport } from './routes/_authenticated/assessment-results'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedProgressRouteImport } from './routes/_authenticated/progress'
 import { Route as AuthenticatedQuizRouteImport } from './routes/_authenticated/quiz'
 import { Route as AuthenticatedRoadmapRouteImport } from './routes/_authenticated/roadmap'
 import { Route as AuthenticatedTutorRouteImport } from './routes/_authenticated/tutor'
@@ -50,9 +53,24 @@ const AuthenticatedAssessmentResultsRoute =
     path: '/assessment-results',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProgressRoute = AuthenticatedProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedQuizRoute = AuthenticatedQuizRouteImport.update({
@@ -77,7 +95,10 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/assessment': typeof AuthenticatedAssessmentRoute
   '/assessment-results': typeof AuthenticatedAssessmentResultsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/progress': typeof AuthenticatedProgressRoute
   '/quiz': typeof AuthenticatedQuizRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
   '/tutor': typeof AuthenticatedTutorRoute
@@ -88,7 +109,10 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/assessment': typeof AuthenticatedAssessmentRoute
   '/assessment-results': typeof AuthenticatedAssessmentResultsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/progress': typeof AuthenticatedProgressRoute
   '/quiz': typeof AuthenticatedQuizRoute
   '/roadmap': typeof AuthenticatedRoadmapRoute
   '/tutor': typeof AuthenticatedTutorRoute
@@ -101,7 +125,10 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/assessment': typeof AuthenticatedAssessmentRoute
   '/_authenticated/assessment-results': typeof AuthenticatedAssessmentResultsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/progress': typeof AuthenticatedProgressRoute
   '/_authenticated/quiz': typeof AuthenticatedQuizRoute
   '/_authenticated/roadmap': typeof AuthenticatedRoadmapRoute
   '/_authenticated/tutor': typeof AuthenticatedTutorRoute
@@ -114,7 +141,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/assessment'
     | '/assessment-results'
+    | '/dashboard'
     | '/onboarding'
+    | '/profile'
+    | '/progress'
     | '/quiz'
     | '/roadmap'
     | '/tutor'
@@ -125,7 +155,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/assessment'
     | '/assessment-results'
+    | '/dashboard'
     | '/onboarding'
+    | '/profile'
+    | '/progress'
     | '/quiz'
     | '/roadmap'
     | '/tutor'
@@ -137,7 +170,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/assessment'
     | '/_authenticated/assessment-results'
+    | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
+    | '/_authenticated/profile'
+    | '/_authenticated/progress'
     | '/_authenticated/quiz'
     | '/_authenticated/roadmap'
     | '/_authenticated/tutor'
@@ -194,11 +230,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAssessmentResultsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/progress': {
+      id: '/_authenticated/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof AuthenticatedProgressRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/quiz': {
@@ -228,7 +285,10 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAssessmentRoute: typeof AuthenticatedAssessmentRoute
   AuthenticatedAssessmentResultsRoute: typeof AuthenticatedAssessmentResultsRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedProgressRoute: typeof AuthenticatedProgressRoute
   AuthenticatedQuizRoute: typeof AuthenticatedQuizRoute
   AuthenticatedRoadmapRoute: typeof AuthenticatedRoadmapRoute
   AuthenticatedTutorRoute: typeof AuthenticatedTutorRoute
@@ -237,7 +297,10 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAssessmentRoute: AuthenticatedAssessmentRoute,
   AuthenticatedAssessmentResultsRoute: AuthenticatedAssessmentResultsRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedProgressRoute: AuthenticatedProgressRoute,
   AuthenticatedQuizRoute: AuthenticatedQuizRoute,
   AuthenticatedRoadmapRoute: AuthenticatedRoadmapRoute,
   AuthenticatedTutorRoute: AuthenticatedTutorRoute,
