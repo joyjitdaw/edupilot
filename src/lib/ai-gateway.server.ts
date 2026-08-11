@@ -118,7 +118,7 @@ export async function chatJson<T>(messages: Msg[]): Promise<T> {
   const cleaned = raw
     .trim()
     .replace(/^```(?:json)?/i, "")
-    .replace(/```$/, "")
+    .replace(/```$/i, "")
     .trim();
 
   try {
