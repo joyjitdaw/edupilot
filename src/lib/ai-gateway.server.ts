@@ -1,5 +1,7 @@
-const GEMINI_API_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+const GROQ_API_URL =
+  "https://api.groq.com/openai/v1/chat/completions";
+
+const GROQ_MODEL = "openai/gpt-oss-20b";
 
 export class AiError extends Error {
   status: number;
@@ -19,73 +21,33 @@ export async function chat(
   messages: Msg[],
   opts?: { json?: boolean },
 ): Promise<string> {
-  const key = process.env.GEMINI_API_KEY;
+  const key = process.env.GROQ_API_KEY;
 
   if (!key) {
     throw new AiError("The AI service is not configured yet.", 500);
   }
 
-  const systemMessages = messages
-    .filter((m) => m.role === "system")
-    .map((m) => m.content)
-    .join("\n\n");
-
-  const contents = messages
-    .filter((m) => m.role !== "system")
-    .map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    }));
-
-  // Gemini expects conversation turns to alternate.
-  const normalizedContents: Array<{
-    role: "user" | "model";
-    parts: Array<{ text: string }>;
-  }> = [];
-
-  for (const message of contents) {
-    const previous = normalizedContents[normalizedContents.length - 1];
-
-    if (previous && previous.role === message.role) {
-      previous.parts.push(...message.parts);
-    } else {
-      normalizedContents.push(message);
-    }
-  }
-
-  // Gemini requires the conversation to begin with a user turn.
-  if (
-    normalizedContents.length === 0 ||
-    normalizedContents[0].role !== "user"
-  ) {
-    normalizedContents.unshift({
-      role: "user",
-      parts: [{ text: "Please respond to the following request." }],
-    });
-  }
+  const groqMessages = messages.map((message) => ({
+    role: message.role,
+    content: message.content,
+  }));
 
   let res: Response;
 
   try {
-    res = await fetch(GEMINI_API_URL, {
+    res = await fetch(GROQ_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": key,
+        Authorization: `Bearer ${key}`,
       },
       body: JSON.stringify({
-        ...(systemMessages
-          ? {
-              systemInstruction: {
-                parts: [{ text: systemMessages }],
-              },
-            }
-          : {}),
-        contents: normalizedContents,
+        model: GROQ_MODEL,
+        messages: groqMessages,
         ...(opts?.json
           ? {
-              generationConfig: {
-                responseMimeType: "application/json",
+              response_format: {
+                type: "json_object",
               },
             }
           : {}),
@@ -100,14 +62,14 @@ export async function chat(
 
   if (res.status === 429) {
     throw new AiError(
-      "Gemini is busy right now. Please try again in a moment.",
+      "Groq is busy right now. Please try again in a moment.",
       429,
     );
   }
 
   if (!res.ok) {
     const errorText = await res.text().catch(() => "");
-    console.error("Gemini API error:", res.status, errorText);
+    console.error("Groq API error:", res.status, errorText);
 
     throw new AiError(
       "The AI service returned an error. Please try again.",
@@ -116,18 +78,14 @@ export async function chat(
   }
 
   const data = (await res.json()) as {
-    candidates?: Array<{
-      content?: {
-        parts?: Array<{
-          text?: string;
-        }>;
+    choices?: Array<{
+      message?: {
+        content?: string;
       };
     }>;
   };
 
-  const content = data.candidates?.[0]?.content?.parts
-    ?.map((part) => part.text ?? "")
-    .join("");
+  const content = data.choices?.[0]?.message?.content;
 
   if (!content) {
     throw new AiError(
@@ -158,7 +116,7 @@ export async function chatJson<T>(messages: Msg[]): Promise<T> {
       try {
         return JSON.parse(cleaned.slice(start, end + 1)) as T;
       } catch {
-        // Continue to error below.
+        // Fall through.
       }
     }
 
