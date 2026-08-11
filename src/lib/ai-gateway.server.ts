@@ -19,7 +19,7 @@ export async function chat(
   messages: Msg[],
   opts?: { json?: boolean },
 ): Promise<string> {
-  const key = process.env["GEMINI_API_KEY"];
+  const key = process.env.GEMINI_API_KEY;
 
   if (!key) {
     throw new AiError("The AI service is not configured yet.", 500);
@@ -36,6 +36,33 @@ export async function chat(
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content }],
     }));
+
+  // Gemini expects conversation turns to alternate.
+  const normalizedContents: Array<{
+    role: "user" | "model";
+    parts: Array<{ text: string }>;
+  }> = [];
+
+  for (const message of contents) {
+    const previous = normalizedContents[normalizedContents.length - 1];
+
+    if (previous && previous.role === message.role) {
+      previous.parts.push(...message.parts);
+    } else {
+      normalizedContents.push(message);
+    }
+  }
+
+  // Gemini requires the conversation to begin with a user turn.
+  if (
+    normalizedContents.length === 0 ||
+    normalizedContents[0].role !== "user"
+  ) {
+    normalizedContents.unshift({
+      role: "user",
+      parts: [{ text: "Please respond to the following request." }],
+    });
+  }
 
   let res: Response;
 
@@ -54,7 +81,7 @@ export async function chat(
               },
             }
           : {}),
-        contents,
+        contents: normalizedContents,
         ...(opts?.json
           ? {
               generationConfig: {
@@ -73,7 +100,7 @@ export async function chat(
 
   if (res.status === 429) {
     throw new AiError(
-      "Gemini is busy right now. Please retry in a moment.",
+      "Gemini is busy right now. Please try again in a moment.",
       429,
     );
   }
@@ -131,7 +158,7 @@ export async function chatJson<T>(messages: Msg[]): Promise<T> {
       try {
         return JSON.parse(cleaned.slice(start, end + 1)) as T;
       } catch {
-        // fall through
+        // Continue to error below.
       }
     }
 
