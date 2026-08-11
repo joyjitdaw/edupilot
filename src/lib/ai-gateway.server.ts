@@ -32,6 +32,14 @@ export async function chat(
     content: message.content,
   }));
 
+  if (opts?.json) {
+    groqMessages.unshift({
+      role: "system",
+      content:
+        "Return your response as valid JSON only. Do not include markdown, code fences, explanations, or any text outside the JSON object.",
+    });
+  }
+
   let res: Response;
 
   try {
